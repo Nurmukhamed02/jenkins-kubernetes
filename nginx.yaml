@@ -1,78 +1,120 @@
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: beka
-spec:
-  selector:
-    matchLabels:
-      app: beka
-  template:
-    metadata:
-      labels:
-        app: beka
-    spec:
-      containers:
-      - name: beka
-        image: nginx:latest
-        imagePullPolicy: Always
-        lifecycle:
-          postStart:
-            exec:
-              command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
-
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: nur
-spec:
-  selector:
-    matchLabels:
-      app: nur
-  template:
-    metadata:
-      labels:
-        app: nur
-    spec:
-      containers:
-      - name: nur
-        image: nginx:latest
-        imagePullPolicy: Always
-        lifecycle:
-          postStart:
-            exec:
-              command: ["/bin/bash", "-c", "echo 'NURMUKHAMMED' > /usr/share/nginx/html/index.html"]
-
----
 apiVersion: v1
-kind: Service
+kind: Pod
 metadata:
-  name: beka-service
-  labels:
-    app: beka
+  name: nginx
 spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-    name: http
-  selector:
-    app: beka
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+    
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: beka
+# spec:
+#   selector:
+#     matchLabels:
+#       app: beka
+#   template:
+#     metadata:
+#       labels:
+#         app: beka
+#     spec:
+#       containers:
+#       - name: beka
+#         image: nginx:latest
+#         imagePullPolicy: Always
+#         lifecycle:
+#           postStart:
+#             exec:
+#               command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
 
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: nur-service
-  labels:
-    app: nur
-spec:
-  type: ClusterIP
-  ports:
-  - port: 80
-    targetPort: 80
-    name: http
-  selector:
-    app: nur
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: nurapiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: beka
+# spec:
+#   selector:
+#     matchLabels:
+#       app: beka
+#   template:
+#     metadata:
+#       labels:
+#         app: beka
+#     spec:
+#       containers:
+#       - name: beka
+#         image: nginx:latest
+#         imagePullPolicy: Always
+#         lifecycle:
+#           postStart:
+#             exec:
+#               command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
+
+# ---
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: nur
+# spec:
+#   selector:
+#     matchLabels:
+#       app: nur
+#   template:
+# spec:
+#   selector:
+#     matchLabels:
+#       app: nur
+#   template:
+#     metadata:
+#       labels:
+#         app: nur
+#     spec:
+#       containers:
+#       - name: nur
+#         image: nginx:latest
+#         imagePullPolicy: Always
+#         lifecycle:
+#           postStart:
+#             exec:
+#               command: ["/bin/bash", "-c", "echo 'NURMUKHAMMED' > /usr/share/nginx/html/index.html"]
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: beka-service
+#   labels:
+#     app: beka
+# spec:
+#   type: ClusterIP
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     name: http
+#   selector:
+#     app: beka
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: nur-service
+#   labels:
+#     app: nur
+# spec:
+#   type: ClusterIP
+#   ports:
+#   - port: 80
+#     targetPort: 80
+#     name: http
+#   selector:
+#     app: nur
 
