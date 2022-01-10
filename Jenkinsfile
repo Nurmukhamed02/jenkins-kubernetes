@@ -10,14 +10,10 @@ pipeline {
       }
     }
 
-    stage ('K8S Deploy') {
+    stage('Deploy App') {
       steps {
         script {
-           kubernetesDeploy(
-                    configs: 'nginx.yaml',
-                    kubeconfigId: 'kube_config',
-                    enableConfigSubstitution: true
-                    )           
+          kubernetesDeploy(configs: "nginx.yaml", kubeconfigId: "mykubeconfig")
                
             }
         }
