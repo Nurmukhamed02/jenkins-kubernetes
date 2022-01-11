@@ -10,14 +10,12 @@ pipeline {
       }
     }
 
-    stage('Deploy App') {
-      steps {
-        script {
-          kubernetesDeploy(configs: "nginx.yaml", kubeconfigId: "mykubeconfig")
+    stage('Apply Kubernetes files') {
+        withKubeConfig([credentialsId: 'mykubeconfig', serverUrl: 'https://0615CDB22445853E01165AD9C054A48F.gr7.us-east-1.eks.amazonaws.com']) {
+           sh 'kubectl apply -f nginx.yaml'
                
             }
         }
     }
   }
 
-}
