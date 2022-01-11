@@ -1,36 +1,36 @@
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: nginx
-spec:
-  containers:
-  - name: nginx
-    image: nginx:latest
-    ports:
-    - containerPort: 80
-    
-# apiVersion: apps/v1
-# kind: Deployment
+# ---
+# apiVersion: v1
+# kind: Pod
 # metadata:
-#   name: beka
+#   name: nginx
 # spec:
-#   selector:
-#     matchLabels:
-#       app: beka
-#   template:
-#     metadata:
-#       labels:
-#         app: beka
-#     spec:
-#       containers:
-#       - name: beka
-#         image: nginx:latest
-#         imagePullPolicy: Always
-#         lifecycle:
-#           postStart:
-#             exec:
-#               command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
+#   containers:
+#   - name: nginx
+#     image: nginx:latest
+#     ports:
+#     - containerPort: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beka
+spec:
+  selector:
+    matchLabels:
+      app: beka
+  template:
+    metadata:
+      labels:
+        app: beka
+    spec:
+      containers:
+      - name: beka
+        image: nginx:latest
+        imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
 
 # ---
 # apiVersion: apps/v1
