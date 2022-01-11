@@ -15,7 +15,7 @@ pipeline {
         script {
            kubernetesDeploy(
                     configs: 'nginx.yaml',
-                    kubeconfigId: 'ee',
+                    kubeconfigId: 'mykubeconfig',
                     enableConfigSubstitution: true
                     )      
                
