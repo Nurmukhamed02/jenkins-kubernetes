@@ -10,10 +10,14 @@ pipeline {
       }
     }
 
-    stage('Apply Kubernetes files') {
+    stage ('K8S Deploy') {
       steps {
-        withKubeConfig([credentialsId: 'mykubeconfig', ]) {
-           sh 'kubectl get nodes'
+        script {
+           kubernetesDeploy(
+                    configs: 'nginx.yaml',
+                    kubeconfigId: 'ee',
+                    enableConfigSubstitution: true
+                    )      
                
             }
         }
