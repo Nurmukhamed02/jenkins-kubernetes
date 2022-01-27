@@ -1,108 +1,170 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgpassword
+type: kubernetes.io/basic-auth
+Data:
+  PGPASSWORD: 12345test
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: web
+  ports:
+    - port: 3000
+      targetPort: 3000
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: beka
+  name: client-deployment
 spec:
+  replicas: 1
   selector:
     matchLabels:
-      app: beka
+      component: web
   template:
     metadata:
       labels:
-        app: beka
+        component: web
     spec:
       containers:
-      - name: beka
-        image: nginx:latest
-        imagePullPolicy: Always
-        lifecycle:
-          postStart:
-            exec:
-              command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
-
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: nurapiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: beka
-# spec:
-#   selector:
-#     matchLabels:
-#       app: beka
-#   template:
-#     metadata:
-#       labels:
-#         app: beka
-#     spec:
-#       containers:
-#       - name: beka
-#         image: nginx:latest
-#         imagePullPolicy: Always
-#         lifecycle:
-#           postStart:
-#             exec:
-#               command: ["/bin/bash", "-c", "echo 'BEKA' > /usr/share/nginx/html/index.html"]
-
-# ---
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   name: nur
-# spec:
-#   selector:
-#     matchLabels:
-#       app: nur
-#   template:
-# spec:
-#   selector:
-#     matchLabels:
-#       app: nur
-#   template:
-#     metadata:
-#       labels:
-#         app: nur
-#     spec:
-#       containers:
-#       - name: nur
-#         image: nginx:latest
-#         imagePullPolicy: Always
-#         lifecycle:
-#           postStart:
-#             exec:
-#               command: ["/bin/bash", "-c", "echo 'NURMUKHAMMED' > /usr/share/nginx/html/index.html"]
-
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: beka-service
-#   labels:
-#     app: beka
-# spec:
-#   type: ClusterIP
-#   ports:
-#   - port: 80
-#     targetPort: 80
-#     name: http
-  
-
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   name: nur-service
-#   labels:
-#     app: nur
-# spec:
-#   type: ClusterIP
-#   ports:
-#   - port: 80
-#     targetPort: 80
-#     name: http
-#   selector:
-#     app: nur
+        - name: client
+          image: stylerhun/multi-client
+          ports:
+            - containerPort: 3000
+--- 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: database-persistent-volume-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+--- 
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: client-cluster-ip-service
+                port:
+                  number: 3000
+          - path: /api/?(.*)
+            pathType: Prefix
+            backend:
+              service:
+                name: server-cluster-ip-service
+                port:
+                  number: 5000
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: postgres
+  ports:
+    - port: 5432
+      targetPort: 5432
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim:
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage
+              mountPath: /var/lib/postgresql/data
+              subPath: postgres
+          env:
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
+--- 
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  type: ClusterIP
+  selector:
+    component: server
+  ports:
+    - port: 5000
+      targetPort: 5000
+--- 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: server-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: server
+  template:
+    metadata:
+      labels:
+        component: server
+    spec:
+      containers:
+        - name: server
+          image: stylerhun/multi-server
+          ports:
+            - containerPort: 5000
+          env:
+            - name: PGUSER
+              value: postgres
+            - name: PGHOST
+              value: postgres-cluster-ip-service
+            - name: PGPORT
+              value: "5432"
+            - name: PGDATABASE
+              value: postgres
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword
+                  key: PGPASSWORD
 
