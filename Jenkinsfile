@@ -14,7 +14,7 @@ pipeline {
       steps {
         script {
            kubernetesDeploy(
-                    configs: 'deployment',
+                    configs: 'deployment/*',
                     kubeconfigId: 'mykubeconfig',
                     enableConfigSubstitution: true
                     )      
