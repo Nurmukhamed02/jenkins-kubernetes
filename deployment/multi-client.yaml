@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  creationTimestamp: null
+  labels:
+    app: multi-client
+  name: multi-client
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: multi-client
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: multi-client
+    spec:
+      containers:
+      - image: stylerhun/multi-client
+        name: multi-client
+        ports:
+        - containerPort: 3000
+        resources: {}
+status: {}
